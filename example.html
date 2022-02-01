@@ -94,9 +94,8 @@
                 }   
                 var time = new Date().getTime();
                 var res = getAltazFromRadecDeg(ra, dec, lat, lon, time);
-                console.log(res);
-                //var resHTML = `altitude: ${res["alt"][0]}° ${res["alt"][1]}' ${res["alt"][2]}"<br/>azimuth: ${res["az"][0]}° ${res["az"][1]}' ${res["az"][2]}"`
-                //document.getElementById("result").innerHTML = resHTML
+                var resHTML = `altitude: ${res["alt"][0]}° ${res["alt"][1]}' ${res["alt"][2]}"<br/>azimuth: ${res["az"][0]}° ${res["az"][1]}' ${res["az"][2]}"`
+                document.getElementById("result").innerHTML = resHTML
             }
         </script> 
     </body>
