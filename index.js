@@ -1,36 +1,22 @@
-var app = require('express')();
-var http = require('http').createServer(app);
-
 const asin = (a) => {return Math.asin(a)};
 const acos = (a) => {return Math.acos(a)};
 const sin = (a) => {return Math.sin(a * Math.PI / 180)};
 const cos = (a) => {return Math.cos(a * Math.PI / 180)};
 
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/example.html');
-});
 
-app.get("/get-altaz-from-radec-deg/:ra/:dec/:lat/:lon/:time", (req, res) => {
-    var ra = parseFloat(req.params.ra);
-    var dec = parseFloat(req.params.dec);
-    var lat = parseFloat(req.params.lat);
-    var lon = parseFloat(req.params.lon);
-    var time = parseFloat(req.params.time);
+//app.get("/get-altaz-from-radec-deg/:ra/:dec/:lat/:lon/:time", (req, res) => {
+function getAltazFromRadecDeg(ra, dec, lat, lon, time){
     var answer = convert(ra, dec, lat, lon, time);
-    res.send(answer);
-});
+    return answer;
+};
 
-app.get("/get-altaz-from-radec-dms/:ra/:dec/:lat/:lon/:time", (req, res) => {
-    var ra = parseFloat(req.params.ra);
-    var dec = parseFloat(req.params.dec);
-    var lat = parseFloat(req.params.lat);
-    var lon = parseFloat(req.params.lon);
-    var time = parseFloat(req.params.time);
+//app.get("/get-altaz-from-radec-dms/:ra/:dec/:lat/:lon/:time", (req, res) => {
+function getAltazFromRadecDms(ra, dec, lat, lon, time){
     var answer = convert(ra, dec, lat, lon, time);
     answer['alt'] = degreesToDms(answer['alt']);
     answer['az'] = degreesToDms(answer['az']);
-    res.send(answer);
-});
+    return answer;
+};
 
 console.log(convert(84.0917,-5.3789,40.5853,-105.0844,new Date().getTime()));//'January 1, 2021 01:00:00'
 function convert(ra, dec, lat, lon, time){
@@ -75,10 +61,6 @@ function degreesToDms(val) {
     var leftover = val - deg;
     var minutes = Math.floor(leftover * 60);
     leftover = leftover - (minutes / 60);
-    var seconds = Math.floor(leftover * 3600);
+    var seconds = Math.floor(leftover * 3600 * 100) / 100;
     return [deg, minutes, seconds]
 }
-
-http.listen(8080, () => {
-    console.log('listening on port 8080');
-});

@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>Ra Dec -> Alt Az Example</title>
+        <script src = "./index.js"></script>
     </head>
     <body>
         <style>
@@ -25,23 +26,78 @@
                 background-color:gray;
                 width:200px;
                 border-right: 2px solid black;
+                display:flex;
+                flex-direction:column;
+                justify-content:center;
             }
             #decDiv{
                 height:100%;
                 background-color:gray;
                 width:200px;
+                display:flex;
+                flex-direction:column;
+                justify-content:center;
+            }
+            .stdInput{
+                padding-top: 20%;
+                padding-bottom: 20%;
+            }
+            #submit{
+                height:100%;
             }
         </style>
         <div id = "main">
             <div id = "raDiv">
+                <input class = 'stdInput' id = 'raH' type = 'number' placeholder = 'Hours' value = '5'></input><!-- HMS-->
+                <input class = 'stdInput' id = 'raM' type = 'number' placeholder = 'Minutes' value = '36'></input>
+                <input class = 'stdInput' id = 'raS' type = 'number' placeholder = 'Seconds' value = '22.7'></input>
+                <p>RA</p>
             </div>
             <div id = "decDiv">
+                <input class = 'stdInput' id='decD' type='number' placeholder='Degrees' value = '-5'></input><!-- DMS-->
+                <input class = 'stdInput' id='decM' type='number' placeholder='Minutes' value = '22'></input>
+                <input class = 'stdInput' id='decS' type='number' placeholder='Seconds' value = '44'></input>
+                <p>Dec</p>
             </div>
-            <button id="submit">submit</button>
-            <p>Result</p>
+            <div id="latDiv">
+                <input class='stdInput' id='lat' type='number' placeholder='Hours' value='40.5853'></input><!-- HMS-->
+                <p>Latitude</p>
+            </div>
+            <div id="lonDiv">
+                <input class='stdInput' id='lon' type='number' placeholder='Degrees' value='-105.0844'></input><!-- DMS-->
+                <p>Longitude</p>
+            </div>
+            <button id="submit" onclick="submit()">submit</button>
+            <p id = "result">Result</p>
         </div>
         <script>
-            
-        </script>
+            function submit(){
+                var raH = parseFloat(document.getElementById("raH").value);
+                var raM = parseFloat(document.getElementById("raM").value);
+                var raS = parseFloat(document.getElementById("raS").value);
+                var decD = parseFloat(document.getElementById("decD").value);
+                var decM = parseFloat(document.getElementById("decM").value);
+                var decS = parseFloat(document.getElementById("decS").value);
+                var lat = parseFloat(document.getElementById("lat").value);
+                var lon = parseFloat(document.getElementById("lon").value);
+                var ra = raH * 15;
+                if(ra > 0){
+                    ra += (raM / 60 * 15 + raS / 3600 * 15);
+                } else{
+                    ra -= (raM / 60 * 15 + raS / 3600 * 15);
+                }
+                var dec = decD;
+                if (dec > 0) {
+                    dec += decM / 60 + decS / 3600;
+                } else {
+                    dec -= decM / 60 + decS / 3600;
+                }   
+                var time = new Date().getTime();
+                var res = getAltazFromRadecDeg(ra, dec, lat, lon, time);
+                console.log(res);
+                //var resHTML = `altitude: ${res["alt"][0]}° ${res["alt"][1]}' ${res["alt"][2]}"<br/>azimuth: ${res["az"][0]}° ${res["az"][1]}' ${res["az"][2]}"`
+                //document.getElementById("result").innerHTML = resHTML
+            }
+        </script> 
     </body>
 </html>
