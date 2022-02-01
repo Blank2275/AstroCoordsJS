@@ -18,7 +18,6 @@ function getAltazFromRadecDms(ra, dec, lat, lon, time){
     return answer;
 };
 
-console.log(convert(84.0917,-5.3789,40.5853,-105.0844,new Date().getTime()));//'January 1, 2021 01:00:00'
 function convert(ra, dec, lat, lon, time){
     time = new Date(time)
     const J2000Date = new Date('January 1, 2000 12:00:00').getTime();
@@ -39,7 +38,6 @@ function convert(ra, dec, lat, lon, time){
             lst += 360;
         }
     }
-    //console.log(lst)
     var ha = lst - ra
     if (ha < 0) {ha += 360}
     var alt = asin(sin(dec)*sin(lat)+cos(dec)*cos(lat)*cos(ha)) * (180 / Math.PI);
