@@ -93,7 +93,7 @@
                     dec -= decM / 60 + decS / 3600;
                 }   
                 var time = new Date().getTime();
-                var res = getAltazFromRadecDeg(ra, dec, lat, lon, time);
+                var res = getAltazFromRadecDms(ra, dec, lat, lon, time);
                 var resHTML = `altitude: ${res["alt"][0]}° ${res["alt"][1]}' ${res["alt"][2]}"<br/>azimuth: ${res["az"][0]}° ${res["az"][1]}' ${res["az"][2]}"`
                 document.getElementById("result").innerHTML = resHTML
             }
