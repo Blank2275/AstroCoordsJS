@@ -2,23 +2,35 @@ const asin = (a) => {return Math.asin(a)};
 const acos = (a) => {return Math.acos(a)};
 const sin = (a) => {return Math.sin(a * Math.PI / 180)};
 const cos = (a) => {return Math.cos(a * Math.PI / 180)};
+const sec = (a) => {return 1 / Math.cos(a * Math.PI / 180)}
 
 
 //app.get("/get-altaz-from-radec-deg/:ra/:dec/:lat/:lon/:time", (req, res) => {
-function getAltazFromRadecDeg(ra, dec, lat, lon, time){
-    var answer = convert(ra, dec, lat, lon, time);
-    return answer;
-};
 
 //app.get("/get-altaz-from-radec-dms/:ra/:dec/:lat/:lon/:time", (req, res) => {
-function getAltazFromRadecDms(ra, dec, lat, lon, time){
-    var answer = convert(ra, dec, lat, lon, time);
+function radecToaltazDms(ra, dec, lat, lon, time){
+    var answer = radecToaltaz(ra, dec, lat, lon, time);
     answer['alt'] = degreesToDms(answer['alt']);
     answer['az'] = degreesToDms(answer['az']);
     return answer;
 };
 
-function convert(ra, dec, lat, lon, time){
+function altazToradecDms(alt, az, lat, lon, time){
+    var answer = altazToradec(alt, az, lat, lon, time);
+    answer['ra'] = degreesToDms(answer['ra']);
+    answer['dec'] = degreesToDms(answer['dec']);
+    return answer;
+};
+
+function altazToradecHms(alt, az, lat, lon, time){
+    var answer = altazToradec(alt, az, lat, lon, time);
+    answer['ra'] = degreesToHms(answer['ra']);
+    answer['dec'] = degreesToDms(answer['dec']);
+    return answer;
+};
+
+console.log(altazToradecHms(-34.6825, 63.7814, 40.5853, -105.0844, new Date('February 1, 2022 12:00:00').getTime()))
+function getLST(time, lon){
     time = new Date(time)
     const J2000Date = new Date('January 1, 2000 12:00:00').getTime();
     const diff = time.getTime() - J2000Date;
@@ -38,6 +50,11 @@ function convert(ra, dec, lat, lon, time){
             lst += 360;
         }
     }
+    return lst;
+}
+
+function radecToaltaz(ra, dec, lat, lon, time){
+    const lst = getLST(time, lon);
     var ha = lst - ra
     if (ha < 0) {ha += 360}
     var alt = asin(sin(dec)*sin(lat)+cos(dec)*cos(lat)*cos(ha)) * (180 / Math.PI);
@@ -53,12 +70,47 @@ function convert(ra, dec, lat, lon, time){
         "az": az
     }
 }
+function altazToradec(alt, az, lat, lon, time){
+    /*
+    right ascension (α)
+    declination (δ)
+    altitude (a)
+    azimuth (A)
+    siderial time (ST)
+    latitude (φ) (Φ)
+    */
+    var lst = getLST(time, lon);
+    var dec = asin(sin(lat)*sin(alt) + cos(lat)*cos(alt)*cos(az)) * (180 / Math.PI);
+    var ha = asin(sin(az)*cos(alt) / cos(dec)) * (180 / Math.PI);//acos((sin(alt) - sin(lat)*sin(dec)) * (sec(lat) * sec(dec))) * (180 / Math.PI);//acos((sin(alt) - sin(lat)*sin(dec)) / (cos(lat)*cos(dec))) * (180 / Math.PI);
+    var ra = lst - ha;
+    console.log(ha)
+    return {
+        "ra": ra,
+        "dec": dec
+    }
+}
 
 function degreesToDms(val) {
-    var deg = Math.floor(val);
-    var leftover = val - deg;
-    var minutes = Math.floor(leftover * 60);
-    leftover = leftover - (minutes / 60);
-    var seconds = Math.floor(leftover * 3600 * 100) / 100;
-    return [deg, minutes, seconds]
+    if(val > 0){
+        var deg = Math.floor(val);
+        var leftover = val - deg;
+        var minutes = Math.floor(leftover * 60);
+        leftover = leftover - (minutes / 60);
+        var seconds = Math.floor(leftover * 3600 * 100) / 100;
+        return [deg, minutes, seconds]
+    } else{
+        var deg = Math.ceil(val);
+        var leftover = Math.abs(val - deg);
+        var minutes = Math.floor(leftover * 60);
+        leftover = Math.abs(leftover - (minutes / 60));
+        var seconds = Math.floor(leftover * 3600 * 100) / 100;
+        return [deg, minutes, seconds]
+    }
+}
+
+function degreesToHms(val) {
+    var hours = Math.floor(val / 15);
+    var minutes = Math.floor(((val/15)-hours)*60);
+    var seconds = Math.floor(((((val/15)-hours)*60)-minutes)*60 * 100) / 100;
+    return [hours, minutes, seconds]
 }
